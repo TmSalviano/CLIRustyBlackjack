@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "type": "lldb",
+        "request": "launch",
+        "name": "Cargo test",
+        "cargo": {
+            "args": [
+                "test",
+                "--no-run",
+                "--lib"
+            ]
+        },
+        "args": []
+    },
+        {
+            "name": "Debug Rust (LLDB)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/blackjack.exe",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}",
+            "internalConsoleOptions": "openOnSessionStart",
+            "sourceLanguages": ["rust"],
+            "preLaunchTask": "cargo build"
+        },
+        {
+            "name": "Release",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/release/blackjack.exe",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}",
+            
+            //"preLaunchTask": "cargo build release"
+        }
+    ]
+}
