@@ -67,12 +67,13 @@ impl Game {
         let mut card_vec = Game::get_initial_cards(&mut deck);
 
         self.player.hand.clear();
+        self.player.hand.add_card(card_vec.pop().unwrap());
+        self.player.hand.add_card(card_vec.pop().unwrap());
+        
         self.dealer.hand.clear();
-
-        self.player.hand.add_card(card_vec.pop().unwrap());
-        self.player.hand.add_card(card_vec.pop().unwrap());
-
-        self.dealer.hand.add_card(card_vec.pop().unwrap());
+        let upcard = card_vec.pop().unwrap();
+        self.dealer.hand.add_card(upcard.clone());
+        self.dealer.set_upcard(upcard);
         self.dealer.hand.add_card(card_vec.pop().unwrap());
         
         deck
@@ -113,8 +114,18 @@ impl Game {
 
     // In this method, the return value None is equivalent to a draw and not a negation of the proposition like in the bet methods.
     fn round(&mut self, deck: &mut Deck) -> Option<WinLose> {
-        //We check if the player is broke before the round starts not during the round
+        //We check if the player is broke before the round starts not during the round. So the edge case should not be handled here
         self.ante_bet();
+
+        println!("{}:", self.player.name());
+        self.player.hand.print_cards();
+        
+        println!("Dealer:",);
+        print!("    Cards -> ");
+        println!("{}, hidden.", self.dealer.up_card().to_string());
+        
+
+        println!("\n{}'s turn!", self.player.name());
         if *self.dealer.up_card() == Card::Ace {
             match self.insurance() {
                 Some(value) => return Some(value),
@@ -130,9 +141,11 @@ impl Game {
         if self.player.hand.is_bust() {
                 return Some(WinLose::Lose)
         }
-        
+
+        println!("\nDealer's turn!");
+        println!("Dealer:");
         self.dealer.hand.print_cards();
-        self.dealer.hit_or_stand(deck);
+        self.dealer.hit_or_stand(deck, self.player.hand.get_total_value());
         if self.dealer.hand.is_bust() {
             return Some(WinLose::Win)
         }
@@ -143,7 +156,6 @@ impl Game {
     //actions
     //implementation of the split should be done in the Game since it is a very special ocurrance that does not fit BetSytem
     fn ante_bet(&mut self) {
-        println!("What is your bet for this round?");
         let amount = self.player.bet();
         self.bet_amount = amount;
 
@@ -156,8 +168,9 @@ impl Game {
     //called if player accepted the doubling of the bet
     fn double(&mut self, deck: &mut Deck) -> Option<WinLose>{
 
-        println!("Do you want to double the pot? \nFunds -> {}$ \n-> Yes\n-> No", self.player.funds());
+        println!("{}:", self.player.name());
         self.player.hand.print_cards();
+        println!("Dealer: Do you want to double the pot? \nFunds: {}$ \n-> Yes\n-> No", self.player.funds());
 
         let mut input: String = String::new(); 
         while input.to_lowercase() != "yes" && input.to_lowercase() != "no" {
@@ -185,6 +198,10 @@ impl Game {
                 }
 
                 self.player.hand.add_card(card.unwrap());
+
+                println!("A card was added for accepting the double offer!");
+
+                println!("{}:", self.player.name());
                 self.player.hand.print_cards();
 
 
@@ -200,7 +217,7 @@ impl Game {
             }
         } 
         
-        println!("HAHAHAHA! Your Loss!");
+        println!("Dealer: HAHAHAHA! Your Loss!");
         return None
     }
 
@@ -267,22 +284,22 @@ pub fn select_difficulty() -> Difficulty {
 
     loop {
         let mut input = String::new();
-        println!("Select Difficulty: \n    -> Easy\n    -> Medium\n    -> Hard");
+        println!("Select Difficulty: \n    -> Easy \n    -> Medium\n    -> Hard");
         
         match stdin().read_line(&mut input) {
             Ok(_) => {
                 let input = input.trim().to_lowercase();
                 match input.as_str() {
                     "easy" => {
-                        println!("Difficulty set to Easy");
+                        println!("Your Buy-in today is 1000");
                         return Difficulty::Easy;
                     },
                     "medium" => {
-                        println!("Difficulty set to Medium");
+                        println!("Your Buy-in for today is $300");
                         return Difficulty::Medium;
                     },
                     "hard" => {
-                        println!("Difficulty set to Hard");
+                        println!("Your Buy-in for today is $50");
                         return Difficulty::Hard;
                     },
                     _ => {
@@ -302,13 +319,15 @@ pub fn select_difficulty() -> Difficulty {
 pub fn select_name() -> String {
     loop {
         let mut input = String::new();
-        println!("What is your name?");
+        println!("Type your name below:");
         let input: String = match stdin().read_line(&mut input) {
             Ok(_) => input.trim().to_string(),
             Err(_) => {
                 continue
             }
         };
+
+        println!("Okay {}, I hope you make a lot of money!", input);
 
         return input
     }

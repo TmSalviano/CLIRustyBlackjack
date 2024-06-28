@@ -115,6 +115,8 @@ impl Hand {
     }
 
     pub fn print_cards(&self) {
+        print!("    Cards -> ");
+
         for (index, card) in self.cards.iter().enumerate() {
             if index == self.cards.len() - 1 {
                 print!("{}.\n", card.to_string());
@@ -127,6 +129,10 @@ impl Hand {
 
    pub fn add_card(&mut self, card: Card) {
         self.cards.push_back(card);
+   }
+
+   pub fn get_total_cards(&self) -> i32 {
+        self.cards.len() as i32
    }
 
    pub fn clear(&mut self) {

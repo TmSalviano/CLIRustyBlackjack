@@ -26,15 +26,18 @@ fn main() {
         
         let mut input = String::new();
         loop {
-            println!("Do you want to quit? \n\tType y for yes, n for no.");
+            println!("Do you want to quit?");
             match stdin().read_line(&mut input) {
                 Ok(_) => {
                     // Trim the input to remove any trailing newline characters
-                    let input = input.trim();
+                    let input = input.trim().to_lowercase();
                     
-                    if input.chars().next() == Some('y') {
-                        println!("Come back soon!");
-                        // Save the player's data
+                    if input == "yes" {
+                        println!("I hope you enjoyed yourself! Your progress will be saved.");
+                        return;
+                    }
+                    if input == "no" {
+                        println!("The next round begins!");
                         break;
                     }
                 },
@@ -43,7 +46,9 @@ fn main() {
                     // Handle the error appropriately
                 }
             };
+            println!("-> yes or no?")
         }
+
     }
 }
     

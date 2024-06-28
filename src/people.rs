@@ -29,12 +29,12 @@ impl Player {
         }
     }
 
-    pub fn bet(&mut self) -> i32 {
+     pub fn bet(&mut self) -> i32 {
         let developer_question: &str = "Dealer: How much you wanna bet?";
 
         loop {
             // The flawed get_player_input function
-            println!("{}", developer_question);
+            println!("{}. Funds: {}$", developer_question, self.funds);
 
             use std::io::{stdin,stdout,Write};
            
@@ -95,6 +95,8 @@ impl Player {
         while hit_stand == HitStand::Hit &&  self.hand.get_total_value() <= 21 {
 
             // The flawed get_player_input function
+            println!("\n{}:", self.name);
+            self.hand.print_cards();
             println!("{}", "Do you want to Hit or Stand?");
 
             use std::io::{stdin,stdout,Write};
@@ -109,7 +111,7 @@ impl Player {
                 input.pop();
             }
 
-            match input.as_str() {
+            match input.to_lowercase().as_str() {
                 "stand" => hit_stand = HitStand::Stand,
                 "hit" => {
                     let mut card = None;
@@ -119,6 +121,9 @@ impl Player {
                     }
 
                     self.hand.add_card(card.unwrap());
+
+                    println!("There is a new card in your");
+
                     self.hand.print_cards();
                 },
                 _ => println!("Type: hit or stand."),
@@ -168,27 +173,33 @@ impl Dealer {
 
     }
 
-    pub fn hit_or_stand(&mut self, deck: &mut Deck) {
+    pub fn hit_or_stand(&mut self, deck: &mut Deck, player_totalvalue: i32 ) {
         while self.hand.get_total_value() <= 21 {
-            if self.hand.get_total_value() >= 17 {
-                println!("Dealer: I Stand!");
-                return
-            } else {
+            if self.hand.get_total_value() < 17  || player_totalvalue > self.hand.get_total_value(){
                 let mut card = None;
                 println!("Dealer: I Hit!");
                 while card == None  {
                     let name = deck.get_random_card_name();
                     card = deck.get_card(name);
                 }
-
                 self.hand.add_card(card.unwrap());
-                self.hand.print_cards();
+            } else {
+                println!("Dealer: I Stand!");
+                return
             }
+            println!("Dealer: ");
+            self.hand.print_cards();
         }
     }
 
     pub fn up_card(&self) -> &Card {
         &self.up_card
+    }
+
+    pub fn set_upcard(&mut self, card: Card ) {
+        if self.hand.get_total_cards() == 1 {
+            self.up_card = card;
+        }
     }
 }
 
@@ -241,7 +252,7 @@ mod people_test {
 
             dealer.hand.add_card(Card::Ten);    
             
-            dealer.hit_or_stand(&mut deck);
+            dealer.hit_or_stand(&mut deck, 18);
         }
 
         println!("Successfully generated a STAND from the dealer");
