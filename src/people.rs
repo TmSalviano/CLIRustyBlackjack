@@ -2,6 +2,9 @@
 // FORGOR ABOUT THE GETTER TO THE FIELDS THAT SHOULD BE PRIVATE
 
 
+use std::thread::sleep;
+use std::time::Duration;
+
 use crate::cards::Deck;
 use crate::cards::{hand::Hand, Card};
 use crate::Difficulty;
@@ -81,10 +84,14 @@ impl Player {
         if self.funds >= money_amount {
             self.funds -= money_amount;
             println!("{}$ added to the pot!", money_amount);
+            sleep(Duration::from_secs(1));
+            print!("\x1B[2J\x1B[1;1H");
             return true
         }
         else {
             println!("Insufficient funds. Funds: {}$!", self.funds);
+            sleep(Duration::from_secs(1));
+            print!("\x1B[2J\x1B[1;1H");
             return false;
         }
     }
@@ -122,15 +129,18 @@ impl Player {
 
                     self.hand.add_card(card.unwrap());
 
-                    println!("There is a new card in your");
+                    println!("There is a new card in your hand!");
 
                     self.hand.print_cards();
+                    sleep(Duration::from_secs(1));
+                    print!("\x1B[2J\x1B[1;1H");
                 },
                 _ => println!("Type: hit or stand."),
             }
         }
 
-
+        sleep(Duration::from_secs(1));
+        print!("\x1B[2J\x1B[1;1H");
         return hit_stand
     }
 
@@ -174,6 +184,8 @@ impl Dealer {
     }
 
     pub fn hit_or_stand(&mut self, deck: &mut Deck, player_totalvalue: i32 ) {
+        sleep(Duration::from_millis(1500));
+        print!("\x1B[2J\x1B[1;1H");
         while self.hand.get_total_value() <= 21 {
             if self.hand.get_total_value() < 17  || player_totalvalue > self.hand.get_total_value(){
                 let mut card = None;
@@ -185,10 +197,14 @@ impl Dealer {
                 self.hand.add_card(card.unwrap());
             } else {
                 println!("Dealer: I Stand!");
+                sleep(Duration::from_millis(1500));
+                print!("\x1B[2J\x1B[1;1H");
                 return
             }
             println!("Dealer: ");
             self.hand.print_cards();
+            sleep(Duration::from_millis(1500));
+            print!("\x1B[2J\x1B[1;1H");
         }
     }
 

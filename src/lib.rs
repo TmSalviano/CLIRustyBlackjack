@@ -1,6 +1,6 @@
 pub mod people;
 pub mod cards;
-use std::io::{stdin,stdout,Write};
+use std::{io::{stdin,stdout,Write}, thread::sleep, time::Duration};
 use cards::{Card, Deck};
 use people::*;
 
@@ -37,6 +37,9 @@ impl Game {
         let difficulty = select_difficulty();
 
         let player_name = select_name();
+
+        sleep(Duration::from_secs(1));
+        print!("\x1B[2J\x1B[1;1H");
 
         let player = people::Player::new(card_vec.pop().unwrap(), card_vec.pop().unwrap(), difficulty, player_name);
         let dealer = people::Dealer::new(card_vec.pop().unwrap(), card_vec.pop().unwrap());
@@ -97,7 +100,7 @@ impl Game {
             Some(value) => {
                 if value == WinLose::Win {
                     let reward = self.bet_amount as f32 * self.reward_multiplier;
-                    self.player.add_to_funds(reward as i32);
+                    self.player.add_to_funds(reward as i32 + self.bet_amount);
                     println!("Congratulations {}. You won: {}$", self.player.name(), reward)
                 } else {
                     //The money is already subtracted from the funds as the game progresses.
@@ -110,6 +113,8 @@ impl Game {
                 println!("Funds: {}", self.player.funds());
             }
         }
+        sleep(Duration::from_secs(2));
+        print!("\x1B[2J\x1B[1;1H");
     }
 
     // In this method, the return value None is equivalent to a draw and not a negation of the proposition like in the bet methods.
@@ -126,6 +131,9 @@ impl Game {
         
 
         println!("\n{}'s turn!", self.player.name());
+        sleep(Duration::from_secs(3));
+        print!("\x1B[2J\x1B[1;1H");
+
         if *self.dealer.up_card() == Card::Ace {
             match self.insurance() {
                 Some(value) => return Some(value),
@@ -143,6 +151,9 @@ impl Game {
         }
 
         println!("\nDealer's turn!");
+        sleep(Duration::from_secs(2));
+        print!("\x1B[2J\x1B[1;1H");
+
         println!("Dealer:");
         self.dealer.hand.print_cards();
         self.dealer.hit_or_stand(deck, self.player.hand.get_total_value());
@@ -161,6 +172,8 @@ impl Game {
 
         if self.player.hand.is_blackjack() {
             println!("Hey... you have a blackjack?! You will now get paid 3:2 if you win!");
+            sleep(Duration::from_secs(1));
+            print!("\x1B[2J\x1B[1;1H");
             self.reward_multiplier *= 1.5;
         }
     }
@@ -210,14 +223,20 @@ impl Game {
                     return Some(WinLose::Lose)
                 }
 
+                sleep(Duration::from_secs(1));
+                print!("\x1B[2J\x1B[1;1H");
                 return None
             }
             else {
-                println!("Not enough funds for the double bet offer.")
+                println!("Not enough funds for the double bet offer.");
+                sleep(Duration::from_secs(1));
+                print!("\x1B[2J\x1B[1;1H");
             }
         } 
         
         println!("Dealer: HAHAHAHA! Your Loss!");
+        sleep(Duration::from_secs(1));
+        print!("\x1B[2J\x1B[1;1H");
         return None
     }
 
@@ -250,7 +269,6 @@ impl Game {
 
             if self.player.try_get_money(insurance_bet_price )
             {
-                println!("You put {}$ on the table", insurance_bet_price);
                 self.bet_amount += insurance_bet_price;
 
                 if self.dealer.hand.is_blackjack() {
@@ -285,21 +303,27 @@ pub fn select_difficulty() -> Difficulty {
     loop {
         let mut input = String::new();
         println!("Select Difficulty: \n    -> Easy \n    -> Medium\n    -> Hard");
+
+        fn message(money: i32) {
+            println!("Your Buy-in today is {}$", money);
+            sleep(Duration::from_secs(1));
+            print!("\x1B[2J\x1B[1;1H");
+        }
         
         match stdin().read_line(&mut input) {
             Ok(_) => {
                 let input = input.trim().to_lowercase();
                 match input.as_str() {
                     "easy" => {
-                        println!("Your Buy-in today is 1000");
+                        message(1000);
                         return Difficulty::Easy;
                     },
                     "medium" => {
-                        println!("Your Buy-in for today is $300");
+                        message(300);
                         return Difficulty::Medium;
                     },
                     "hard" => {
-                        println!("Your Buy-in for today is $50");
+                        message(50);
                         return Difficulty::Hard;
                     },
                     _ => {
@@ -328,6 +352,8 @@ pub fn select_name() -> String {
         };
 
         println!("Okay {}, I hope you make a lot of money!", input);
+        sleep(Duration::from_secs(1));
+        print!("\x1B[2J\x1B[1;1H");
 
         return input
     }

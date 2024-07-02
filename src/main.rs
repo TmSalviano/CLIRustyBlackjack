@@ -26,6 +26,7 @@ fn main() {
         
         let mut input = String::new();
         loop {
+            input.clear();
             println!("Do you want to quit?");
             match stdin().read_line(&mut input) {
                 Ok(_) => {
@@ -36,17 +37,20 @@ fn main() {
                         println!("I hope you enjoyed yourself! Your progress will be saved.");
                         return;
                     }
-                    if input == "no" {
+                     else if input == "no" {
                         println!("The next round begins!");
                         break;
+                    } else {
+                        println!("-> yes or no?");
+                        continue;
                     }
                 },
                 Err(_) => {
                     println!("Failed to read line.");
+                    continue;
                     // Handle the error appropriately
                 }
-            };
-            println!("-> yes or no?")
+            }
         }
 
     }
