@@ -2,13 +2,9 @@ use std::io::stdin;
 
 use blackjack::cards::Deck;
 
-//blackjack{select_difficulty, select_name};
-
-
 //Everything that you are not going to use here should be private. That is true not only
 // in the KING Binary file but also to the rest of the hierarchy.
 
-//Dont forget taht after you finish logic implementation the program is going to required a lot of polishing
 
 fn main() {
     let mut deck = Deck::new();
@@ -34,7 +30,7 @@ fn main() {
                     let input = input.trim().to_lowercase();
                     
                     if input == "yes" {
-                        println!("I hope you enjoyed yourself! Your progress will be saved.");
+                        println!("Thank you for playing! I hope you enjoyed yourself!");
                         return;
                     }
                      else if input == "no" {
